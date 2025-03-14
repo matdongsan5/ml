@@ -52,7 +52,7 @@ def RLE(type, alphaList,X_train, X_test, y_train, y_test):
         print('poly 적용')
     else:
         pass
-    resultDF = pd.DataFrame(columns = ['alpha','train_score', 'test_score','diff', 'train_loss', 'test_loss', 'coef'])
+    resultDF = pd.DataFrame(columns = ['alpha','train_score', 'test_score','diff', 'train_loss', 'test_loss', 'coef','intercept'])
     kf = KFold()
     ## alpha값에 따른 Ridge 모델 성능 비교
     for alpha in alphaList:
@@ -105,13 +105,14 @@ def RLE(type, alphaList,X_train, X_test, y_train, y_test):
             #     coef = model.coef_
             # else:
             coef = model.coef_
+            intercept = model.intercept_
             
             train_stotal += train_score
             test_stotal += test_score
             train_ltotal += train_loss
             test_ltotal += test_loss
         #alpha값 별로 성능과 손실값 평균 저장하기    
-        resultDF.loc[alpha] = [alpha, train_stotal/5,test_stotal/5,train_stotal/5-test_stotal/5,train_ltotal/5,test_ltotal/5, coef.round(4)]
+        resultDF.loc[alpha] = [alpha, train_stotal/5,test_stotal/5,train_stotal/5-test_stotal/5,train_ltotal/5,test_ltotal/5, coef.round(4), intercept]
     
     print(resultDF)
     fives(resultDF, type)
@@ -120,7 +121,7 @@ def fives(resultDF, title='None'):
     fig, axe = plt.subplots(1,5, figsize=(12,6), sharex=True)
     axe = axe.flatten()
     cmap = plt.get_cmap('Spectral')
-    colors = [cmap(i) for i in np.linspace(0, 5, 24)]
+    colors = [cmap(i) for i in np.linspace(0, 5, 20)]
     for ax, col, color1 in zip(axe, resultDF.columns[1:], colors):
         ax.plot(resultDF['alpha'], resultDF[col], color = color1, label=col)
         ax.legend()
